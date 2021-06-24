@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>VK_WallSaver</RootNamespace>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <Authors>Shark_vil</Authors>
+    <Company>Shark_vil Production</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="VkNet" Version="1.63.0-627" />
+  </ItemGroup>
+
+</Project>
