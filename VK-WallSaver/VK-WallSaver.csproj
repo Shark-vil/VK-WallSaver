@@ -9,7 +9,7 @@
     <Company>Shark_vil Production</Company>
     <RepositoryUrl>https://github.com/Shark-vil/VK-WallSaver</RepositoryUrl>
     <PackageIcon>logo.png</PackageIcon>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
