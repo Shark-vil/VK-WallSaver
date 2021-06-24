@@ -163,6 +163,8 @@ namespace VK_WallSaver
             if (!Directory.Exists(LocalStoragePath))
                 Directory.CreateDirectory(LocalStoragePath);
 
+            Console.WriteLine();
+
             var client = new WebClient();
             var VisualProgressBar = new ProgressBar();
 
