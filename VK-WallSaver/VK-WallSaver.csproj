@@ -7,10 +7,19 @@
     <ApplicationIcon>logo.ico</ApplicationIcon>
     <Authors>Shark_vil</Authors>
     <Company>Shark_vil Production</Company>
+    <RepositoryUrl>https://github.com/Shark-vil/VK-WallSaver</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="VkNet" Version="1.63.0-627" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
