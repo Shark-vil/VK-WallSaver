@@ -163,10 +163,14 @@ namespace VK_WallSaver
             if (!Directory.Exists(LocalStoragePath))
                 Directory.CreateDirectory(LocalStoragePath);
 
+            Console.WriteLine();
+
             var client = new WebClient();
             var VisualProgressBar = new ProgressBar();
 
             WallGetObject Posts;
+
+            ulong PostsCount = 100;
             ulong PostsOffset = 0;
             ulong TotalCount = 0;
             ulong ProgressCount = 0;
@@ -176,7 +180,7 @@ namespace VK_WallSaver
                 Posts = api.Wall.Get(new WallGetParams
                 {
                     OwnerId = OwnerId,
-                    Count = 50,
+                    Count = PostsCount,
                     Offset = PostsOffset,
                 });
 
@@ -185,62 +189,90 @@ namespace VK_WallSaver
 
                 foreach (Post post in Posts.WallPosts)
                 {
-                    foreach (Attachment PostAttachment in post.Attachments)
-                    {
-                        if (PostAttachment.Type == typeof(Photo))
+                    if (post.Attachments.Count == 0)
+                        VisualProgressBar.SetProgressText("No attachments found");
+                    else
+                        foreach (Attachment PostAttachment in post.Attachments)
                         {
-                            var photo = (Photo)PostAttachment.Instance;
-                            ulong lastWidth = 0;
-                            ulong lastHeight = 0;
-                            PhotoSize finalPhoto = null;
-
-                            foreach (PhotoSize pSize in photo.Sizes)
+                            if (PostAttachment.Type == typeof(Photo))
                             {
-                                if (pSize.Width > lastWidth && pSize.Height > lastHeight)
+                                var photo = (Photo)PostAttachment.Instance;
+                                ulong lastWidth = 0;
+                                ulong lastHeight = 0;
+                                Uri photoUri = null;
+
+                                if (photo.Sizes != null)
                                 {
-                                    lastWidth = pSize.Width;
-                                    lastHeight = pSize.Height;
-                                    finalPhoto = pSize;
-                                }
-                            }
-
-                            if (finalPhoto != null && finalPhoto.Url != null)
-                            {
-                                string FileName = Path.GetFileName(finalPhoto.Url.LocalPath);
-                                string SavedPath = Path.Combine(LocalStoragePath, FileName);
-
-                                if (!File.Exists(SavedPath))
-                                {
-                                    if (CurrentAsynchronous < LimitAsynchronous && (ProgressCount / TotalCount) < 90)
-                                    {
-                                        CurrentAsynchronous++;
-
-                                        var AsyncClient = new WebClient();
-                                        AsyncClient.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) =>
+                                    foreach (PhotoSize pSize in photo.Sizes)
+                                        if (pSize.Width > lastWidth || pSize.Height > lastHeight)
                                         {
-                                            if (CurrentAsynchronous - 1 >= 0)
-                                                CurrentAsynchronous--;
+                                            lastWidth = pSize.Width;
+                                            lastHeight = pSize.Height;
+                                            photoUri = pSize.Url;
+                                        }
+                                }
+                                else if (photo.BigPhotoSrc != null)
+                                    photoUri = photo.BigPhotoSrc;
+                                else if (photo.PhotoSrc != null)
+                                    photoUri = photo.PhotoSrc;
+                                else if (photo.Photo2560 != null)
+                                    photoUri = photo.Photo2560;
+                                else if (photo.Photo1280 != null)
+                                    photoUri = photo.Photo1280;
+                                else if (photo.Photo807 != null)
+                                    photoUri = photo.Photo807;
+                                else if (photo.Photo604 != null)
+                                    photoUri = photo.Photo604;
+                                else if (photo.Photo130 != null)
+                                    photoUri = photo.Photo130;
+                                else if (photo.Photo100 != null)
+                                    photoUri = photo.Photo100;
+                                else if (photo.Photo75 != null)
+                                    photoUri = photo.Photo75;
+                                else if (photo.Photo50 != null)
+                                    photoUri = photo.Photo50;
 
+                                if (photoUri != null)
+                                {
+                                    string FileName = Path.GetFileName(photoUri.LocalPath);
+                                    string SavedPath = Path.Combine(LocalStoragePath, FileName);
+
+                                    if (!File.Exists(SavedPath))
+                                    {
+                                        if (CurrentAsynchronous < LimitAsynchronous && (ProgressCount / TotalCount) < 90)
+                                        {
+                                            CurrentAsynchronous++;
+
+                                            var AsyncClient = new WebClient();
+                                            AsyncClient.DownloadFileCompleted += (object sender, System.ComponentModel.AsyncCompletedEventArgs e) =>
+                                            {
+                                                if (CurrentAsynchronous - 1 >= 0)
+                                                    CurrentAsynchronous--;
+
+                                                VisualProgressBar.SetProgressText($"{FileName} ( {ProgressCount}/{TotalCount} )");
+                                            };
+                                            AsyncClient.DownloadFileAsync(photoUri, SavedPath);
+                                        }
+                                        else
+                                        {
+                                            client.DownloadFile(photoUri, SavedPath);
                                             VisualProgressBar.SetProgressText($"{FileName} ( {ProgressCount}/{TotalCount} )");
-                                        };
-                                        AsyncClient.DownloadFileAsync(finalPhoto.Url, SavedPath);
+                                        }
                                     }
                                     else
-                                    {
-                                        client.DownloadFile(finalPhoto.Url, SavedPath);
-                                        VisualProgressBar.SetProgressText($"{FileName} ( {ProgressCount}/{TotalCount} )");
-                                    }
+                                        VisualProgressBar.SetProgressText($"File {FileName} exists ( {ProgressCount}/{TotalCount} )");
                                 }
+                                else
+                                    VisualProgressBar.SetProgressText("Couldn't find URL photos");
                             }
                         }
-                    }
 
                     ProgressCount++;
                     VisualProgressBar.Report((double)ProgressCount / (double)TotalCount);
                     Thread.Sleep(50);
                 }
 
-                PostsOffset += 100;
+                PostsOffset += PostsCount;
                 Thread.Sleep(1000);
             }
             while (Posts.WallPosts.Count != 0);
