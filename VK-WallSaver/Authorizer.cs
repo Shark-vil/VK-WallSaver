@@ -35,11 +35,13 @@ namespace VK_WallSaver
             EConsole.Print("Does your account have 2-step authentication?");
             bool IsTwoStepAuthorization = EConsole.HasYes();
 
+            Console.WriteLine();
+
             EConsole.Print("Enter user login:");
-            string UserLogin = Console.ReadLine();
+            string UserLogin = EConsole.ReadLine();
 
             EConsole.Print("Enter user password:");
-            string UserPassword = Console.ReadLine();
+            string UserPassword = EConsole.ReadPassword();
 
             var AuthParams = new ApiAuthParams
             {
@@ -53,7 +55,7 @@ namespace VK_WallSaver
                 AuthParams.TwoFactorAuthorization = () =>
                 {
                     EConsole.Print("Enter the verification code to login:");
-                    return Console.ReadLine();
+                    return EConsole.ReadLine();
                 };
 
             try
