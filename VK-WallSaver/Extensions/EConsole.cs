@@ -26,6 +26,35 @@ namespace VK_WallSaver.Extensions
 
         public static bool HasNo() => !HasYes();
 
+        // Source: https://stackoverflow.com/a/3404522/13457296
+        public static string ReadPassword()
+        {
+            var pass = string.Empty;
+            ConsoleKey key;
+
+            Console.Write("> ");
+
+            do
+            {
+                var keyInfo = Console.ReadKey(intercept: true);
+                key = keyInfo.Key;
+
+                if (key == ConsoleKey.Backspace && pass.Length > 0)
+                {
+                    Console.Write("\b \b");
+                    pass = pass[0..^1];
+                }
+                else if (!char.IsControl(keyInfo.KeyChar))
+                {
+                    Console.Write("*");
+                    pass += keyInfo.KeyChar;
+                }
+            } while (key != ConsoleKey.Enter);
+
+            Console.WriteLine();
+
+            return pass;
+        }
         public static string ReadKey()
         {
             string Key = Console.ReadLine();
