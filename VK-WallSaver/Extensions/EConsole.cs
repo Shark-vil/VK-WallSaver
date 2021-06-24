@@ -15,7 +15,7 @@ namespace VK_WallSaver.Extensions
             do
             {
                 Console.WriteLine("Y/n");
-                Answer = Console.ReadLine();
+                Answer = ReadLine();
                 Answer = Answer.Trim();
                 Answer = Answer.ToLower();
             }
@@ -55,6 +55,21 @@ namespace VK_WallSaver.Extensions
 
             return pass;
         }
+
+        public static string ReadLine(ConsoleColor TextColor = ConsoleColor.White)
+        {
+            string ReadText = string.Empty;
+            ConsoleColor PreviewColor = Console.ForegroundColor;
+            Console.ForegroundColor = TextColor;
+
+            Console.Write("> ");
+            ReadText = Console.ReadLine();
+
+            Console.ForegroundColor = PreviewColor;
+
+            return ReadText;
+        }
+
         public static string ReadKey()
         {
             string Key = Console.ReadLine();
